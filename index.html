@@ -100,14 +100,6 @@
             padding: 0;
             text-align: center;
         }
-
-        button.checked::after {
-            content: '';
-            color: white;
-            font-size: 30px;
-            line-height: 40px;
-        }
-
         .categories {
             font-size: 18px;
             color: #333;
@@ -125,6 +117,16 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
+        /* Menghapus efek biru pada tombol ketika ditekan atau diberi fokus */
+        button:focus {
+            outline: none; /* Menghilangkan outline biru saat tombol dipilih/fokus */
+            box-shadow: none; /* Menghilangkan efek shadow biru saat tombol dipilih/fokus */
+        }
+
+        button:active {
+            background-color: #45a049; /* Warna latar belakang saat tombol ditekan */
+            box-shadow: none; /* Menghilangkan shadow saat tombol ditekan */
+        }
     </style>
 </head>
 <body>
@@ -133,9 +135,11 @@
     </header>
 
     <nav>
-<a href="https://miracle-lempoy.github.io/platfrom1/">Platform1</a>
-        <a href="https://miracle-lempoy.github.io/platfrom2/">Platfrom2</a>
-        <a href="https://miracle-lempoy.github.io/about/">About</a>
+        <a href="platfrom1.html">Platform1</a>
+        <a href="platfrom2.html">Platfrom2</a>
+        <a href="about.html">About</a>
+        <a href="services.html">dalam erorr</a>
+        <a href="blog.html">dalam erorr</a>
     </nav>
 
     <div class="container">
@@ -223,7 +227,7 @@
                 case 'lazada':
                     searchURL = 'https://www.lazada.co.id/catalog/?q=' + encodeURIComponent(query);
                     break;
-                case 'upload_foto':
+                    case 'upload_foto':
                     // Platform untuk upload foto
                     if (selectedImage) {
                         imageResult.innerHTML = `<h4>Foto yang Anda Unggah:</h4><img src="${selectedImage}" alt="Uploaded Image">`;
@@ -261,7 +265,7 @@
             showImageButton.style.display = 'none'; // Sembunyikan tombol tampilkan foto
             imageResult.innerHTML = '';  // Hapus gambar yang diupload
 
-// Reset nilai input pencarian
+            // Reset nilai input pencarian
             queryInput.value = '';
 
             // Set tampilan sesuai dengan platform yang dipilih
