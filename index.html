@@ -285,17 +285,285 @@
 
         // Menyimpan platform yang dipilih dan input pencarian di localStorage
         platformSelect.addEventListener('change', function() {
-            // Tidak menyimpan apa-apa lagi di localStorage, pastikan data di-reset
-            localStorage.removeItem('selectedPlatform');
-            localStorage.removeItem('searchQuery');
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platfrom1</title>
+    <style>
+        /* Animasi fade-in */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header, nav, .container, section, h1, h2, h3, p, .categories, form, input[type="text"], select, button, #fileInput {
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+
+        nav {
+            background-color: #333;
+            overflow: hidden;
+        }
+
+        nav a {
+            float: left;
+            display: block;
+            color: white;
+            padding: 14px 20px;
+            text-align: center;
+            text-decoration: none;
+            transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+            transform: scale(1.2);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        section {
+            padding: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], select {
+            padding: 10px;
+            width: 300px;
+            margin-right: 10px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button.checked {
+            background-color: #2196F3;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            text-align: center;
+        }
+
+        button.checked::after {
+            content: '';
+            color: white;
+            font-size: 30px;
+            line-height: 40px;
+        }
+
+        .categories {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        #fileInput {
+            animation: fadeIn 1.6s ease-out;
+        }
+
+        #imageResult img {
+            max-width: 100%;
+            max-height: 600px;
+            display: block;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Platfrom1 Pengguna</h1>
+    </header>
+
+    <nav>
+        <a href="platfrom1.html">Platform1</a>
+        <a href="platfrom2.html">Platfrom2</a>
+        <a href="about.html">About</a>
+        <a href="services.html">dalam erorr</a>
+        <a href="blog.html">dalam erorr</a>
+    </nav>
+
+    <div class="container">
+        <section>
+            <h2>Selamat Datang di Platfrom1</h2>
+            <p>Ini adalah halaman dashboard, tempat Anda bisa melihat informasi dan data terkait pengguna.</p>
+
+            <p class="categories">Pilih platform untuk mencari konten: YouTube, Google, Pinterest, Shopee, Lazada, DuckDuckGo, Bukalapak, TikTok, dan Unggah Foto</p>
+
+            <h3>Cari Konten</h3>
+
+            <form id="searchForm">
+                <select id="platform">
+                    <option value="">Pilih...</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="google">Google</option>
+                    <option value="pinterest">Pinterest</option>
+                    <option value="shopee">Shopee</option>
+                    <option value="lazada">Lazada</option>
+                    <option value="upload_foto">Unggah Foto</option>
+                </select>
+
+                <input type="text" id="query" placeholder="Masukkan kata pencarian" style="display:none;">
+                <button type="submit" id="searchButton" style="display:none;">Cari</button>
+
+                <input type="file" id="fileInput" accept="image/*" style="display:none;">
+                <button type="button" id="showImageButton" style="display:none;">Tampilkan Foto</button>
+
+                <div id="youtubeResult"></div>
+                <div id="imageResult"></div>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        const searchButton = document.getElementById('searchButton');
+        const queryInput = document.getElementById('query');
+        const platformSelect = document.getElementById('platform');
+        const fileInput = document.getElementById('fileInput');
+        const showImageButton = document.getElementById('showImageButton');
+        const youtubeResult = document.getElementById('youtubeResult');
+        const imageResult = document.getElementById('imageResult');
+        let selectedImage = null;
+
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const query = queryInput.value;
+            const platform = platformSelect.value;
+
+            if (!query && platform !== 'upload_foto') {
+                alert('Mohon masukkan kata pencarian terlebih dahulu.');
+                return;
+            }
+
+            let searchURL;
+            youtubeResult.innerHTML = '';
+            imageResult.innerHTML = '';
+
+            switch(platform) {
+                case 'youtube':
+                    searchURL = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(query);
+                    break;
+                case 'google':
+                    searchURL = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+                    break;
+                case 'pinterest':
+                    searchURL = 'https://www.pinterest.com/search/pins/?q=' + encodeURIComponent(query);
+                    break;
+                case 'shopee':
+                    searchURL = 'https://shopee.co.id/search?keyword=' + encodeURIComponent(query);
+                    break;
+                case 'lazada':
+                    searchURL = 'https://www.lazada.co.id/catalog/?q=' + encodeURIComponent(query);
+                    break;
+                case 'upload_foto':
+                    if (selectedImage) {
+                        imageResult.innerHTML = `<h4>Foto yang Anda Unggah:</h4><img src="${selectedImage}" alt="Uploaded Image">`;
+                    }
+                    return;
+                default:
+                    searchURL = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+            }
+
+            window.open(searchURL, '_blank');
+            searchButton.classList.add('checked');
         });
 
-        // Menangani reset input pencarian ketika halaman di-refresh atau platform 'Pilih...' dipilih
-        window.addEventListener('beforeunload', function() {
-            // Menghapus data yang disimpan sebelum halaman ditutup
-            localStorage.removeItem('selectedPlatform');
-            localStorage.removeItem('searchQuery');
+        fileInput.addEventListener('change', function() {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedImage = e.target.result;
+                    showImageButton.style.display = 'inline-block';  // Menampilkan tombol Tampilkan Foto
+                };
+                reader.readAsDataURL(file);
+            }
         });
+
+        showImageButton.addEventListener('click', function() {
+            if (selectedImage) {
+                imageResult.innerHTML = `<h4>Foto yang Anda Unggah:</h4><img src="${selectedImage}" alt="Uploaded Image">`;
+                showImageButton.style.display = 'none';  // Menyembunyikan tombol setelah gambar ditampilkan
+            } else {
+                alert('Silakan unggah foto terlebih dahulu.');
+            }
+        });
+
+        platformSelect.addEventListener('change', function() {
+            const platform = platformSelect.value;
+            if (platform === '') {
+                queryInput.style.display = 'none';
+                searchButton.style.display = 'none';
+                fileInput.style.display = 'none';
+                showImageButton.style.display = 'none';
+                imageResult.innerHTML = '';
+                queryInput.value = '';
+            } else if (platform === 'upload_foto') {
+                queryInput.style.display = 'none';
+                searchButton.style.display = 'none';
+                fileInput.style.display = 'block';
+                showImageButton.style.display = 'inline-block';  // Menampilkan tombol Tampilkan Foto
+            } else {
+                queryInput.style.display = 'block';
+                searchButton.style.display = 'block';
+                fileInput.style.display = 'none';
+                showImageButton.style.display = 'none';
+                queryInput.value = '';
+            }
+        });
+
+     window.addEventListener('load', function() {
+                platformSelect.value = '';  // Reset platform ke 'Pilih...'
+                queryInput.value = '';  // Reset input pencarian
+                queryInput.style.display = 'none';
+                searchButton.style.display = 'none';
+                fileInput.style.display = 'none';
+                showImageButton.style.display = 'none';
+                imageResult.innerHTML = '';  // Hapus gambar yang diupload
+            });
     </script>
 </body>
 </html>
