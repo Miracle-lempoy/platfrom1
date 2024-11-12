@@ -120,10 +120,11 @@
 
         #imageResult img {
             max-width: 100%;
-            max-height: 600px;
-            display: block;
-            margin: 20px 0;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
     </style>
 </head>
 <body>
@@ -144,11 +145,13 @@
             <h2>Selamat Datang di Platfrom1</h2>
             <p>Ini adalah halaman dashboard, tempat Anda bisa melihat informasi dan data terkait pengguna.</p>
 
+            <!-- Menambahkan teks kategori platform pencarian -->
             <p class="categories">Pilih platform untuk mencari konten: YouTube, Google, Pinterest, Shopee, Lazada, DuckDuckGo, Bukalapak, TikTok, dan Unggah Foto</p>
 
             <h3>Cari Konten</h3>
 
             <form id="searchForm">
+                <!-- Platform pilih -->
                 <select id="platform">
                     <option value="">Pilih...</option>
                     <option value="youtube">YouTube</option>
@@ -156,16 +159,22 @@
                     <option value="pinterest">Pinterest</option>
                     <option value="shopee">Shopee</option>
                     <option value="lazada">Lazada</option>
+                    <!-- Platform baru untuk upload foto -->
                     <option value="upload_foto">Unggah Foto</option>
                 </select>
 
+                <!-- Input pencarian -->
                 <input type="text" id="query" placeholder="Masukkan kata pencarian" style="display:none;">
+                <!-- Tombol -->
                 <button type="submit" id="searchButton" style="display:none;">Cari</button>
 
+                <!-- Input untuk Upload Foto (sembunyi sampai platform diubah) -->
                 <input type="file" id="fileInput" accept="image/*" style="display:none;">
                 <button type="button" id="showImageButton" style="display:none;">Tampilkan Foto</button>
 
+                <!-- Tempat untuk menampilkan hasil YouTube -->
                 <div id="youtubeResult"></div>
+                <!-- Tempat untuk menampilkan foto yang diupload -->
                 <div id="imageResult"></div>
             </form>
         </section>
@@ -181,20 +190,25 @@
         const imageResult = document.getElementById('imageResult');
         let selectedImage = null;
 
+        // Menangani submit form
         document.getElementById('searchForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            e.preventDefault();  // Mencegah refresh halaman
             const query = queryInput.value;
             const platform = platformSelect.value;
 
+            // Deteksi input kosong
             if (!query && platform !== 'upload_foto') {
                 alert('Mohon masukkan kata pencarian terlebih dahulu.');
                 return;
             }
 
             let searchURL;
+
+            // Reset hasil pencarian
             youtubeResult.innerHTML = '';
             imageResult.innerHTML = '';
 
+            // Tentukan URL pencarian berdasarkan platform yang dipilih
             switch(platform) {
                 case 'youtube':
                     searchURL = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(query);
@@ -212,71 +226,98 @@
                     searchURL = 'https://www.lazada.co.id/catalog/?q=' + encodeURIComponent(query);
                     break;
                 case 'upload_foto':
+                    // Platform untuk upload foto
                     if (selectedImage) {
                         imageResult.innerHTML = `<h4>Foto yang Anda Unggah:</h4><img src="${selectedImage}" alt="Uploaded Image">`;
                     }
-                    return;
+                    return; // Hentikan eksekusi untuk platform lainnya
                 default:
                     searchURL = 'https://www.google.com/search?q=' + encodeURIComponent(query);
             }
 
             window.open(searchURL, '_blank');
+            // Tambahkan class 'checked' setelah pencarian dilakukan
             searchButton.classList.add('checked');
         });
 
+        // Fungsi untuk menangani upload foto
         fileInput.addEventListener('change', function() {
             const file = fileInput.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    selectedImage = e.target.result;
-                    showImageButton.style.display = 'inline-block';  // Menampilkan tombol Tampilkan Foto
+                    selectedImage = e.target.result;  // Menyimpan URL gambar yang dipilih
                 };
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(file);  // Mengubah file menjadi URL gambar
             }
         });
 
+        // Mengubah tampilan form saat platform lain dipilih
+        platformSelect.addEventListener('change', function() {
+            const platform = platformSelect.value;
+
+            // Reset dan sembunyikan elemen terkait
+            queryInput.style.display = 'none';
+            searchButton.style.display = 'none';
+            fileInput.style.display = 'none';
+            showImageButton.style.display = 'none'; // Sembunyikan tombol tampilkan foto
+            imageResult.innerHTML = '';  // Hapus gambar yang diupload
+
+// Reset nilai input pencarian
+            queryInput.value = '';
+
+            // Set tampilan sesuai dengan platform yang dipilih
+            if (platform === 'upload_foto') {
+                // Platform upload foto
+                fileInput.style.display = 'block';
+                showImageButton.style.display = 'block';  // Tampilkan tombol 'Tampilkan Foto'
+            } else if (platform === '') {
+                // Jika platform 'Pilih...', sembunyikan semua elemen
+                queryInput.style.display = 'none';
+                searchButton.style.display = 'none';
+                fileInput.style.display = 'none';
+                showImageButton.style.display = 'none';
+            } else {
+                // Platform lain (YouTube, Google, dll)
+                queryInput.style.display = 'block';
+                searchButton.style.display = 'block';
+            }
+        });
+
+        // Fungsi untuk menampilkan gambar yang diupload
         showImageButton.addEventListener('click', function() {
             if (selectedImage) {
                 imageResult.innerHTML = `<h4>Foto yang Anda Unggah:</h4><img src="${selectedImage}" alt="Uploaded Image">`;
-                showImageButton.style.display = 'none';  // Menyembunyikan tombol setelah gambar ditampilkan
             } else {
-                alert('Silakan unggah foto terlebih dahulu.');
+                alert("Pilih foto terlebih dahulu.");
             }
         });
 
+        // Cek apakah ada platform yang tersimpan di localStorage setelah refresh
+        window.addEventListener('load', function() {
+            // Menghapus data dari localStorage dan reset platform ke 'Pilih...'
+            platformSelect.value = ''; // Setel kembali ke nilai default 'Pilih...'
+            queryInput.value = ''; // Reset input pencarian
+            queryInput.style.display = 'none';
+            searchButton.style.display = 'none';
+            fileInput.style.display = 'none';
+            showImageButton.style.display = 'none';
+            imageResult.innerHTML = '';  // Hapus gambar yang diupload
+        });
+
+        // Menyimpan platform yang dipilih dan input pencarian di localStorage
         platformSelect.addEventListener('change', function() {
-            const platform = platformSelect.value;
-            if (platform === '') {
-                queryInput.style.display = 'none';
-                searchButton.style.display = 'none';
-                fileInput.style.display = 'none';
-                showImageButton.style.display = 'none';
-                imageResult.innerHTML = '';
-                queryInput.value = '';
-            } else if (platform === 'upload_foto') {
-                queryInput.style.display = 'none';
-                searchButton.style.display = 'none';
-                fileInput.style.display = 'block';
-                showImageButton.style.display = 'inline-block';  // Menampilkan tombol Tampilkan Foto
-            } else {
-                queryInput.style.display = 'block';
-                searchButton.style.display = 'block';
-                fileInput.style.display = 'none';
-                showImageButton.style.display = 'none';
-                queryInput.value = '';
-            }
+            // Tidak menyimpan apa-apa lagi di localStorage, pastikan data di-reset
+            localStorage.removeItem('selectedPlatform');
+            localStorage.removeItem('searchQuery');
         });
 
-     window.addEventListener('load', function() {
-                platformSelect.value = '';  // Reset platform ke 'Pilih...'
-                queryInput.value = '';  // Reset input pencarian
-                queryInput.style.display = 'none';
-                searchButton.style.display = 'none';
-                fileInput.style.display = 'none';
-                showImageButton.style.display = 'none';
-                imageResult.innerHTML = '';  // Hapus gambar yang diupload
-            });
+        // Menangani reset input pencarian ketika halaman di-refresh atau platform 'Pilih...' dipilih
+        window.addEventListener('beforeunload', function() {
+            // Menghapus data yang disimpan sebelum halaman ditutup
+            localStorage.removeItem('selectedPlatform');
+            localStorage.removeItem('searchQuery');
+        });
     </script>
 </body>
-    </html>
+</html>
